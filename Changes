@@ -1,0 +1,9 @@
+0.10    2012-07-30
+- added fire_and_forget option to allow not dying on errors
+- send multiple lines of data at a time
+  (it'll keep the socket open; if you need to close it,
+   use the new ->close method, or let your $graphite object
+   go out of scope)
+
+0.01    2012-06-17
+- initial release
