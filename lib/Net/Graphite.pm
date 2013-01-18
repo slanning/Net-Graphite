@@ -20,6 +20,11 @@ sub new {
     }, $class;
 }
 
+sub trace {
+    my (undef, $val_line) = @_;
+    print STDERR $val_line;
+}
+
 sub send {
     my $self = shift;
     my $value;
@@ -31,6 +36,8 @@ sub send {
     my $time = $args{time} || time;
 
     my $plaintext = "$path $value $time\n";
+
+    $self->trace($plaintext) if $self->{trace};
 
     unless ($Net::Graphite::TEST) {
         if ($self->connect()) {
@@ -81,6 +88,7 @@ Net::Graphite - Interface to Graphite
       host => '127.0.0.1',   # default
       port => 2003,          # default
       path => 'foo.bar.baz', # optional
+      trace => 0,            # copy output to STDERR if true
   );
   $graphite->send(6);        # default time is "now"
 
