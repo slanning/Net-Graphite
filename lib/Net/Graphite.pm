@@ -14,6 +14,7 @@ sub new {
         host            => '127.0.0.1',
         port            => 2003,
         fire_and_forget => 0,
+        timeout         => 1,
         # path
         @_,
         # _socket
@@ -52,12 +53,14 @@ sub send {
 
 sub connect {
     my $self = shift;
-    return $self->{_socket} if $self->{_socket};
+    return $self->{_socket}
+      if $self->{_socket} && $self->{_socket}->connected;
 
     $self->{_socket} = IO::Socket::INET->new(
         PeerHost => $self->{host},
         PeerPort => $self->{port},
         Proto => 'tcp',
+        Timeout => $self->{timeout},
     );
     confess "Error creating socket: $!"
       if not $self->{_socket} and not $self->{fire_and_forget};
