@@ -93,6 +93,8 @@ Net::Graphite - Interface to Graphite
       port => 2003,          # default
       path => 'foo.bar.baz', # optional
       trace => 0,            # copy output to STDERR if true
+      proto => 'tcp',        # default (can be 'udp')
+      timeout => 1,          # default
   );
   $graphite->send(6);        # default time is "now"
 
@@ -117,7 +119,7 @@ Interface to Graphite which doesn't depend on AnyEvent.
 
 AnyEvent::Graphite
 
-http://graphite.wikidot.com/
+L<http://graphite.wikidot.com/>
 
 =head1 AUTHOR
 
