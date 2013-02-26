@@ -1,3 +1,8 @@
+0.11    2013-02-26
+- trace option (patch from Rafael Garcia-Suarez)
+- allow setting socket Proto and Timeout (patch from Herald van der Breggen)
+- ->connect reconnects if not ->connected
+
 0.10    2012-07-30
 - added fire_and_forget option to allow not dying on errors
 - send multiple lines of data at a time

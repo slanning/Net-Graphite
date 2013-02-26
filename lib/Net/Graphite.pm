@@ -4,7 +4,7 @@ use warnings;
 use Carp qw/confess/;
 use IO::Socket::INET;
 
-$Net::Graphite::VERSION = '0.10';
+$Net::Graphite::VERSION = '0.11';
 
 our $TEST = 0;
 
