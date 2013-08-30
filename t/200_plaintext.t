@@ -16,7 +16,7 @@ base.path.c 3 1377861711
 base.path.d 4 1377861711
 base.path.e 5 1377861711
 TXT
-    my $sent = $graphite->send(plaintext => $plaintext);
+    my $sent = $graphite->send(data => $plaintext);
 
     # fairly useless test..
     is($sent, $plaintext, 'sent plaintext');
