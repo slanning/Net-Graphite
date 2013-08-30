@@ -3,8 +3,9 @@ use strict;
 use warnings;
 use Carp qw/confess/;
 use IO::Socket::INET;
+use Scalar::Util qw/reftype/;
 
-$Net::Graphite::VERSION = '0.12';
+$Net::Graphite::VERSION = '0.13';
 
 our $TEST = 0;   # if true, don't send anything to graphite
 
@@ -17,14 +18,10 @@ sub new {
         proto           => 'tcp',
         timeout         => 1,
         # path
+        # transformer
         @_,
         # _socket
     }, $class;
-}
-
-sub trace {
-    my (undef, $val_line) = @_;
-    print STDERR $val_line;
 }
 
 sub send {
@@ -34,13 +31,40 @@ sub send {
     my %args = @_;
 
     my $plaintext;
-    unless ($plaintext = $args{plaintext}) {
+    if ($args{data}) {
+        my $xform = $args{transformer} || $self->transformer;
+        if ($xform) {
+            $plaintext = $xform->($args{data});
+        }
+        else {
+            if (ref $args{data}) {
+                my $reftype = reftype $args{data};
+
+                # default transformers
+                if ($reftype eq 'HASH') {
+                    # hash structure from Yves
+                    foreach my $epoch (sort {$a <=> $b} keys %{ $args{data} }) {
+                        _fill_lines_for_epoch(\$plaintext, $epoch, $args{data}{$epoch}, $self->path);
+                    }
+                }
+                else {
+                    confess "Arg 'data' passed to send method is a ref but has no plaintext transformer";
+                }
+            }
+            else {
+                # this obsoletes plaintext; just pass 'data' without a transformer
+                $plaintext = $args{data};
+            }
+        }
+    }
+    else {
         $value   = $args{value} unless defined $value;
         my $path = $args{path} || $self->path;
         my $time = $args{time} || time;
 
         $plaintext = "$path $value $time\n";
     }
+
     $self->trace($plaintext) if $self->{trace};
 
     unless ($Net::Graphite::TEST) {
@@ -54,10 +78,22 @@ sub send {
     return $plaintext;
 }
 
-sub path {
-    my ($self, $path) = @_;
-    $self->{path} = $path if defined $path;
-    return $self->{path};
+sub _fill_lines_for_epoch {
+    # note: $in_out_str_ref is a reference to a string,
+    # not so much for performance but as an accumulator in this recursive function
+    my ($in_out_str_ref, $epoch, $hash, $path) = @_;
+
+    # still in the "branches"
+    if (ref $hash) {
+        foreach my $key (sort keys %$hash) {
+            my $value = $hash->{$key};
+            _fill_lines_for_epoch($in_out_str_ref, $epoch, $value, "$path.$key");
+        }
+    }
+    # reached the "leaf" value
+    else {
+        $$in_out_str_ref .= "$path $hash $epoch\n";
+    }
 }
 
 sub connect {
@@ -82,6 +118,23 @@ sub close {
     my $self = shift;
     $self->{_socket}->close();
     $self->{_socket} = undef;
+}
+
+sub trace {
+    my (undef, $val_line) = @_;
+    print STDERR $val_line;
+}
+
+### mutators
+sub path {
+    my ($self, $path) = @_;
+    $self->{path} = $path if defined $path;
+    return $self->{path};
+}
+sub transformer {
+    my ($self, $xform) = @_;
+    $self->{transformer} = $xform if defined $xform;
+    return $self->{transformer};
 }
 
 1;
@@ -125,7 +178,13 @@ Net::Graphite - Interface to Graphite
  -OR-
 
   # send text with one line per metric, following the plaintext protocol
-  $graphite->send(plaintext => $string_with_one_line_per_metric);
+  $graphite->send(data => $string_with_one_line_per_metric);
+
+ -OR-
+
+  # send a data structure with a coderef to transform it to plaintext
+  $graphite->send(data => $hash);   # HoH -> epoch => key => key => key .... => value
+  $graphite->send(data => $whatever, transformer => \&make_whatever_into_plaintext);
 
 =head1 DESCRIPTION
 
@@ -152,7 +211,14 @@ for use when sending single values.
 
 =head2 send
 
-Normally all you need to use. See the SYNOPSIS.
+Normally all you need to use. See the SYNOPSIS. (FIXME)
+
+=head2 transformer
+
+If you pass a 'data' argument to send,
+use this coderef to transform from the data structure to plaintext.
+The coderef receives the data structure as its only parameter.
+There are default transformers for certain reftypes.
 
 =head1 SEE ALSO
 

@@ -1,3 +1,8 @@
+0.13    2013-08-30
+- removed 'plaintext'; please use 'data' instead
+- added ability to pass arbitrary data structures to 'data' param of send,
+  along with a coderef for 'transformer' to turn it into plaintext
+
 0.12    2013-08-30
 - added 'plaintext' parameter to send,
   for sending multi-line text instead of line-by-line
