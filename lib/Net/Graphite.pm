@@ -47,6 +47,19 @@ sub send {
                         _fill_lines_for_epoch(\$plaintext, $epoch, $args{data}{$epoch}, $self->path);
                     }
                 }
+                # TODO - not sure what structure is most useful;
+                # an aref of [$path, $value, $epoch] seems a bit trivial?
+                # elsif ($reftype eq 'ARRAY') {
+                #
+                # }
+                # TODO
+                # elsif ($reftype eq 'CODE') {
+                #     my $iter = $args{data};
+                #     while (my $text = $iter->()) {
+                #         $plaintext .= $text;
+                #     }
+                # }
+                # how about sth of DBI? XML? maybe not
                 else {
                     confess "Arg 'data' passed to send method is a ref but has no plaintext transformer";
                 }
@@ -182,8 +195,11 @@ Net::Graphite - Interface to Graphite
 
  -OR-
 
-  # send a data structure with a coderef to transform it to plaintext
-  $graphite->send(data => $hash);   # HoH -> epoch => key => key => key .... => value
+  # send a data structure, default transformer for HoH: epoch => key => key => key .... => value
+  $graphite->send(data => $hash);
+
+  # send a data structure, providing your own plaintext transformer
+  # (the callback's only arg is the data structure, return a text string one metric on each line)
   $graphite->send(data => $whatever, transformer => \&make_whatever_into_plaintext);
 
 =head1 DESCRIPTION
