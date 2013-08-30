@@ -4,4 +4,5 @@ README
 lib/Net/Graphite.pm
 t/000_load.t
 t/100_new.t
+t/200_plaintext.t
 META.yml                                 Module meta-data (added by MakeMaker)
