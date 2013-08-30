@@ -30,15 +30,17 @@ sub trace {
 sub send {
     my $self = shift;
     my $value;
-    $value = shift if @_ % 2;
-
+    $value = shift if @_ % 2;   # single value passed in
     my %args = @_;
-    $value = $args{value} unless defined $value;
-    my $path = $args{path} || $self->{path};
-    my $time = $args{time} || time;
 
-    my $plaintext = "$path $value $time\n";
+    my $plaintext;
+    unless ($plaintext = $args{plaintext}) {
+        $value   = $args{value} unless defined $value;
+        my $path = $args{path} || $self->path;
+        my $time = $args{time} || time;
 
+        $plaintext = "$path $value $time\n";
+    }
     $self->trace($plaintext) if $self->{trace};
 
     unless ($Net::Graphite::TEST) {
