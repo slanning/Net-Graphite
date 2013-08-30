@@ -4,9 +4,9 @@ use warnings;
 use Carp qw/confess/;
 use IO::Socket::INET;
 
-$Net::Graphite::VERSION = '0.11';
+$Net::Graphite::VERSION = '0.12';
 
-our $TEST = 0;
+our $TEST = 0;   # if true, don't send anything to graphite
 
 sub new {
     my $class = shift;
@@ -52,6 +52,12 @@ sub send {
     return $plaintext;
 }
 
+sub path {
+    my ($self, $path) = @_;
+    $self->{path} = $path if defined $path;
+    return $self->{path};
+}
+
 sub connect {
     my $self = shift;
     return $self->{_socket}
@@ -89,37 +95,68 @@ Net::Graphite - Interface to Graphite
 
   use Net::Graphite;
   my $graphite = Net::Graphite->new(
-      host => '127.0.0.1',   # default
-      port => 2003,          # default
-      path => 'foo.bar.baz', # optional
-      trace => 0,            # copy output to STDERR if true
-      proto => 'tcp',        # default (can be 'udp')
-      timeout => 1,          # default
+      # except for host, these hopefully have reasonable defaults, so are optional
+      host => '127.0.0.1',
+      port => 2003,
+      trace => 0,            # if true, copy what's sent to STDERR
+      proto => 'tcp',        # can be 'udp'
+      timeout => 1,          # timeout of socket connect in seconds
+      fire_and_forget => 0,  # if true, ignore sending errors
+
+      path => 'foo.bar.baz', # optional, use when sending single values
   );
+
+  # send a single value,
+  # need to set path in the call to new
+  # or call $graphite->path('some.path') beforehand
   $graphite->send(6);        # default time is "now"
 
- OR
+ -OR-
 
-  my $graphite = Net::Graphite->new(
-      host => '127.0.0.1',   # default
-      port => 2003,          # default
-      fire_and_forget => 1,  # if I can't send, I don't care!
-  );
+  # send a metric with named parameters
   $graphite->send(
       path => 'foo.bar.baz',
       value => 6,
-      time => time(),
+      time => time(),        # time defaults to "now"
   );
+
+ -OR-
+
+  # send text with one line per metric, following the plaintext protocol
+  $graphite->send(plaintext => $string_with_one_line_per_metric);
 
 =head1 DESCRIPTION
 
 Interface to Graphite which doesn't depend on AnyEvent.
 
+=head1 INSTANCE METHODS
+
+=head2 close
+
+Explicitly close the socket to the graphite server.
+Not normally needed,
+because the socket will close when the $graphite object goes out of scope.
+
+=head2 connect
+
+Get an open a socket to the graphite server, either the currently connected one
+or, if not already connected, a new one.
+Not normally needed.
+
+=head2 path
+
+Set the default path (corresponds to 'path' argument to new),
+for use when sending single values.
+
+=head2 send
+
+Normally all you need to use. See the SYNOPSIS.
+
 =head1 SEE ALSO
 
 AnyEvent::Graphite
 
-L<http://graphite.wikidot.com/>
+L<http://graphite.readthedocs.org/>
 
 =head1 AUTHOR
 
