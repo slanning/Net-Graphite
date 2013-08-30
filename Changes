@@ -1,14 +1,17 @@
+0.12    2013-08-30
+- added 'plaintext' parameter to send,
+  for sending multi-line text instead of line-by-line
+
 0.11    2013-02-26
-- trace option (patch from Rafael Garcia-Suarez)
+- 'trace' option (patch from Rafael Garcia-Suarez)
 - allow setting socket Proto and Timeout (patch from Herald van der Breggen)
 - ->connect reconnects if not ->connected
 
 0.10    2012-07-30
-- added fire_and_forget option to allow not dying on errors
-- send multiple lines of data at a time
+- added 'fire_and_forget' parameter to send to allow not dying on errors
+- send multiple lines of data on the same socket
   (it'll keep the socket open; if you need to close it,
-   use the new ->close method, or let your $graphite object
-   go out of scope)
+   use the new ->close method, or let your $graphite object go out of scope)
 
 0.01    2012-06-17
 - initial release
