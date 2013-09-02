@@ -1,3 +1,6 @@
+0.14    2013-09-02
+- added this Changes file to MANIFEST (noticed by Sawyer X)
+
 0.13    2013-08-30  (hackathon at booking.com)
 - removed 'plaintext'; please use 'data' instead
 - added ability to pass arbitrary data structures to 'data' param of send,
