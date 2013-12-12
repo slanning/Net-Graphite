@@ -1,6 +1,7 @@
 package Net::Graphite;
 use strict;
 use warnings;
+use Errno qw(EINTR);
 use Carp qw/confess/;
 use IO::Socket::INET;
 use Scalar::Util qw/reftype/;
@@ -82,8 +83,17 @@ sub send {
 
     unless ($Net::Graphite::TEST) {
         if ($self->connect()) {
-            # for now, I'll assume these don't fail...
-            $self->{_socket}->send($plaintext);
+            my $buf = $plaintext;
+            while (length($buf)) {
+                my $res = $self->{_socket}->send($buf);
+                if (not defined $res) {
+                    next if $! == EINTR;
+                    last; # not sure what to do here
+                }
+
+                last unless $res; # should never happen
+                substr($buf, 0, $res, '');
+            }
         }
         # I didn't close the socket!
     }
