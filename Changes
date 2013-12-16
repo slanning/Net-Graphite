@@ -1,5 +1,6 @@
-0.14    2013-09-02
-- added this Changes file to MANIFEST (noticed by Sawyer X)
+0.14    2013-12-16
+- added the Changes file to MANIFEST (noticed by Sawyer X)
+- patch from Ivan Kruglov to deal with interrupts during ->send
 
 0.13    2013-08-30  (hackathon at booking.com)
 - removed 'plaintext'; please use 'data' instead

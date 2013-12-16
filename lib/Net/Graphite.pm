@@ -6,7 +6,7 @@ use Carp qw/confess/;
 use IO::Socket::INET;
 use Scalar::Util qw/reftype/;
 
-$Net::Graphite::VERSION = '0.13';
+$Net::Graphite::VERSION = '0.14';
 
 our $TEST = 0;   # if true, don't send anything to graphite
 
