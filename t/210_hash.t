@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 1;
+use Test::More tests => 2;
 
 use Net::Graphite;
 $Net::Graphite::TEST = 1;
@@ -34,4 +34,9 @@ who.what.c.six 6 1377872334
 TXT
 
     is($sent, $expected, 'sent hash');
+
+    my $graphite_no_path = Net::Graphite->new();
+    my $sent_with_path = $graphite_no_path->send( path => 'who.what', data => $hash );
+
+    is($sent_with_path, $expected, 'sent hash without hardcoded root path');
 }

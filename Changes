@@ -1,3 +1,6 @@
+0.15    2014-09-15
+- add path parameter to ->send (patch from Matt Koscica)
+
 0.14    2013-12-16
 - added the Changes file to MANIFEST (noticed by Sawyer X)
 - patch from Ivan Kruglov to deal with interrupts during ->send

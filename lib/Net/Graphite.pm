@@ -6,7 +6,7 @@ use Carp qw/confess/;
 use IO::Socket::INET;
 use Scalar::Util qw/reftype/;
 
-$Net::Graphite::VERSION = '0.14';
+$Net::Graphite::VERSION = '0.15';
 
 our $TEST = 0;   # if true, don't send anything to graphite
 
@@ -44,8 +44,9 @@ sub send {
                 # default transformers
                 if ($reftype eq 'HASH') {
                     # hash structure from Yves
+                    my $start_path = $args{path} ? $args{path} : $self->path;
                     foreach my $epoch (sort {$a <=> $b} keys %{ $args{data} }) {
-                        _fill_lines_for_epoch(\$plaintext, $epoch, $args{data}{$epoch}, $self->path);
+                        _fill_lines_for_epoch(\$plaintext, $epoch, $args{data}{$epoch}, $start_path);
                     }
                 }
                 # TODO - not sure what structure is most useful;
@@ -207,25 +208,25 @@ Net::Graphite - Interface to Graphite
 
   # send a data structure,
   # here using the default transformer for Hash of Hash: epoch => key => key .... => value
-  $graphite->send(data => $hash);
+  $graphite->send(path => 'foo', data => $hash);
 
   # example of hash structure:
   1234567890 => {
-      foo => {
-          bar => {
-              db1 => 3,
-              db2 => 7,
-              db3 => 2,
-              ....
-          },
-          baz => 42,
+      bar => {
+          db1 => 3,
+          db2 => 7,
+          db3 => 2,
+          ....
       },
+      baz => 42,
   },
   would be:
   foo.bar.db1 = 3
   foo.bar.db2 = 7
   foo.bar.db3 = 2
   foo.baz = 42
+
+ -OR-
 
   # send a data structure, providing your own plaintext transformer
   # (the callback's only arg is the data structure, return a text string one metric on each line)
