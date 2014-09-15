@@ -44,8 +44,9 @@ sub send {
                 # default transformers
                 if ($reftype eq 'HASH') {
                     # hash structure from Yves
+                    my $start_path = $args{path} ? $args{path} : $self->path;
                     foreach my $epoch (sort {$a <=> $b} keys %{ $args{data} }) {
-                        _fill_lines_for_epoch(\$plaintext, $epoch, $args{data}{$epoch}, $self->path);
+                        _fill_lines_for_epoch(\$plaintext, $epoch, $args{data}{$epoch}, $start_path);
                     }
                 }
                 # TODO - not sure what structure is most useful;
