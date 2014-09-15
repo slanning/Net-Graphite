@@ -208,25 +208,25 @@ Net::Graphite - Interface to Graphite
 
   # send a data structure,
   # here using the default transformer for Hash of Hash: epoch => key => key .... => value
-  $graphite->send(data => $hash);
+  $graphite->send(path => 'foo', data => $hash);
 
   # example of hash structure:
   1234567890 => {
-      foo => {
-          bar => {
-              db1 => 3,
-              db2 => 7,
-              db3 => 2,
-              ....
-          },
-          baz => 42,
+      bar => {
+          db1 => 3,
+          db2 => 7,
+          db3 => 2,
+          ....
       },
+      baz => 42,
   },
   would be:
   foo.bar.db1 = 3
   foo.bar.db2 = 7
   foo.bar.db3 = 2
   foo.baz = 42
+
+ -OR-
 
   # send a data structure, providing your own plaintext transformer
   # (the callback's only arg is the data structure, return a text string one metric on each line)
