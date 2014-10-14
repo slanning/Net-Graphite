@@ -13,11 +13,12 @@ our $TEST = 0;   # if true, don't send anything to graphite
 sub new {
     my $class = shift;
     return bless {
-        host            => '127.0.0.1',
-        port            => 2003,
-        fire_and_forget => 0,
-        proto           => 'tcp',
-        timeout         => 1,
+        host                 => '127.0.0.1',
+        port                 => 2003,
+        fire_and_forget      => 0,
+        return_connect_error => 0,
+        proto                => 'tcp',
+        timeout              => 1,
         # path
         # transformer
         @_,
@@ -132,11 +133,17 @@ sub connect {
         Timeout  => $self->{timeout},
     );
 
-    return undef
-        if not $self->{_socket} and $self->{return_connect_error};
-    confess "Error creating socket: $!"
-      if not $self->{_socket} and not $self->{fire_and_forget};
-
+    unless ($self->{_socket}) {
+        if ($self->{return_connect_error}) {
+            # This is probably only used if you call $graphite->connect before ->send
+            # in order to check if there is a connection;
+            # otherwise, it'll just "forget" (without even "firing").
+            return;
+        }
+        elsif (not $self->{fire_and_forget}) {
+            confess "Error creating socket: $!";
+        }
+    }
     return $self->{_socket};
 }
 
@@ -178,15 +185,15 @@ Net::Graphite - Interface to Graphite
   use Net::Graphite;
   my $graphite = Net::Graphite->new(
       # except for host, these hopefully have reasonable defaults, so are optional
-      host => '127.0.0.1',
-      port => 2003,
-      trace => 0,            # if true, copy what's sent to STDERR
-      proto => 'tcp',        # can be 'udp'
-      timeout => 1,          # timeout of socket connect in seconds
-      fire_and_forget => 0,  # if true, ignore sending errors
-      return_connect_error => 1, # if true, forward connect error to caller
+      host                  => '127.0.0.1',
+      port                  => 2003,
+      trace                 => 0,                # if true, copy what's sent to STDERR
+      proto                 => 'tcp',            # can be 'udp'
+      timeout               => 1,                # timeout of socket connect in seconds
+      fire_and_forget       => 0,                # if true, ignore sending errors
+      return_connect_error  => 0,                # if true, forward connect error to caller
 
-      path => 'foo.bar.baz', # optional, use when sending single values
+      path                  => 'foo.bar.baz', # optional, use when sending single values
   );
 
   # to check for connection error (when return_connect_error => 1) do:
