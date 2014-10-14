@@ -1,3 +1,7 @@
+0.16    2014-10-14
+- add return_connect_error param to ->new for if you don't want ->connect to die
+  (patch from Petya Kohts)
+
 0.15    2014-09-15
 - add path parameter to ->send (patch from Matt Koscica)
 
