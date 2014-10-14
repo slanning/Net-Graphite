@@ -131,6 +131,9 @@ sub connect {
         Proto    => $self->{proto},
         Timeout  => $self->{timeout},
     );
+
+    return undef
+        if not $self->{_socket} and $self->{return_connect_error};
     confess "Error creating socket: $!"
       if not $self->{_socket} and not $self->{fire_and_forget};
 
@@ -181,9 +184,13 @@ Net::Graphite - Interface to Graphite
       proto => 'tcp',        # can be 'udp'
       timeout => 1,          # timeout of socket connect in seconds
       fire_and_forget => 0,  # if true, ignore sending errors
+      return_connect_error => 1, # if true, forward connect error to caller
 
       path => 'foo.bar.baz', # optional, use when sending single values
   );
+
+  # to check for connection error (when return_connect_error => 1) do:
+  die "connection error: $!" unless $graphite->connect;
 
   # send a single value,
   # need to set path in the call to new
