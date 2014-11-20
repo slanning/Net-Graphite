@@ -20,11 +20,11 @@ $Net::Graphite::TEST = 1;
 }
 
 {
-    my $graphite = Net::Graphite->new(
+    my $graphite = Net::Graphite->new({
         host => '127.0.0.2',
         port => 2004,
         path => 'foo.bar.baz',
-    );
+    });
 
     is($graphite->{host}, '127.0.0.2', 'host set');
     is($graphite->{port}, 2004, 'port set');
