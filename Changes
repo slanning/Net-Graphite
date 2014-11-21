@@ -1,3 +1,5 @@
+- accept constructor parameters as a hashref
+
 0.16    2014-10-14
 - add return_connect_error param to ->new for if you don't want ->connect to die
   (patch from Petya Kohts)

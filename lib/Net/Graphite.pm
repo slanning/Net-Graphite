@@ -12,6 +12,7 @@ our $TEST = 0;   # if true, don't send anything to graphite
 
 sub new {
     my $class = shift;
+    my %args = @_ == 1 && ref $_[0] eq 'HASH' ? %{$_[0]} : @_;
     return bless {
         host                 => '127.0.0.1',
         port                 => 2003,
@@ -21,7 +22,7 @@ sub new {
         timeout              => 1,
         # path
         # transformer
-        @_,
+        %args,
         # _socket
     }, $class;
 }
