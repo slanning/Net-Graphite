@@ -162,9 +162,8 @@ sub connect {
 # if you need to close/flush for some reason
 sub close {
     my $self = shift;
-    return unless $self->{_socket};
-    $self->{_socket}->close();
-    $self->{_socket} = undef;
+    return unless my $socket = delete $self->{_socket};
+    $socket->close();
 }
 
 sub debug {
