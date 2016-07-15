@@ -10,8 +10,6 @@ $Net::Graphite::VERSION = '0.16';
 
 our $TEST = 0;   # if true, don't send anything to graphite
 
-sub DEBUG { 0 }
-
 sub new {
     my $class = shift;
     my %args = @_ == 1 && ref $_[0] eq 'HASH' ? %{$_[0]} : @_;
@@ -50,7 +48,7 @@ sub send {
                     # hash structure from Yves
                     my $start_path = $args{path} ? $args{path} : $self->path;
                     foreach my $epoch (sort {$a <=> $b} keys %{ $args{data} }) {
-                        $self->_fill_lines_for_epoch(\$plaintext, $epoch, $args{data}{$epoch}, $start_path);
+                        _fill_lines_for_epoch(\$plaintext, $epoch, $args{data}{$epoch}, $start_path);
                     }
                 }
                 # TODO - not sure what structure is most useful;
@@ -71,7 +69,7 @@ sub send {
                 }
             }
             else {
-                # just plaintext 'data' without a transformer
+                # this obsoletes plaintext; just pass 'data' without a transformer
                 $plaintext = $args{data};
             }
         }
@@ -157,14 +155,8 @@ sub close {
     $socket->close();
 }
 
-sub debug {
-    my ($self, $level, @arg) = @_;
-    printf STDERR @arg, $/
-      if $level >= DEBUG;
-}
-
 sub trace {
-    my ($self, $val_line) = @_;
+    my (undef, $val_line) = @_;
     print STDERR $val_line;
 }
 
