@@ -109,22 +109,13 @@ sub send {
 sub _fill_lines_for_epoch {
     # note: $in_out_str_ref is a reference to a string,
     # not so much for performance but as an accumulator in this recursive function
-    my ($self, $in_out_str_ref, $epoch, $hash, $path) = @_;
+    my ($in_out_str_ref, $epoch, $hash, $path) = @_;
 
     # still in the "branches"
     if (ref $hash) {
         foreach my $key (sort keys %$hash) {
-            # if we have a utf8 key try to downgrade it.
-            if (utf8::is_utf8($key) and !utf8::downgrade($key,1)) { # perl bug means I cant say "fail_ok" here, hence the 1.
-                $self->debug(1, "Skipping utf8 key: %s.'%s'", $path, encode_utf8($key))
-                  if DEBUG;
-                next;
-            }
-
-            (my $escaped_key = $key) =~ s/[^-A-Za-z0-9()\[\]:]/_/mg;
             my $value = $hash->{$key};
-
-            $self->_fill_lines_for_epoch($in_out_str_ref, $epoch, $value, "$path.$escaped_key");
+            _fill_lines_for_epoch($in_out_str_ref, $epoch, $value, "$path.$key");
         }
     }
     # reached the "leaf" value
