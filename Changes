@@ -1,11 +1,16 @@
-- accept constructor parameters as a hashref
+0.17    2016-07-15
+- accept ->new({....}) in addition to ->new(....)
+  patch from Dagfinn Ilmari Mannsåker (from Nov 2014, sorry I forgot about it)
+- avoid error in case _socket is undef (e.g. never sent a metric before destroying)
+  patch from Matt Koscica
 
 0.16    2014-10-14
 - add return_connect_error param to ->new for if you don't want ->connect to die
-  (patch from Petya Kohts)
+  patch from Petya Kohts
 
 0.15    2014-09-15
-- add path parameter to ->send (patch from Matt Koscica)
+- add path parameter to ->send
+  patch from Matt Koscica
 
 0.14    2013-12-16
 - added the Changes file to MANIFEST (noticed by Sawyer X)
@@ -22,8 +27,10 @@
   for sending multi-line text instead of line-by-line
 
 0.11    2013-02-26
-- 'trace' option (patch from Rafael Garcia-Suarez)
-- allow setting socket Proto and Timeout (patch from Herald van der Breggen)
+- 'trace' option
+  patch from Rafael Garcia-Suarez
+- allow setting socket Proto and Timeout
+  patch from Herald van der Breggen
 - ->connect reconnects if not ->connected
 
 0.10    2012-07-30
