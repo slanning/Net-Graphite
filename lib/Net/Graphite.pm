@@ -114,6 +114,9 @@ sub flush {
 
                     substr($buf, 0, $res, '');
                 }
+                if (length($buf) && not $self->{fire_and_forget}) {
+                    confess "Error sending data";
+                }
             }
         }
         # I didn't close the socket!
